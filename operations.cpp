@@ -1936,3 +1936,213 @@ public:
        
     }
 };
+
+1717. Maximum Score From Removing Substrings
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a string s and two integers x and y. You can perform two types of operations any number of times.
+
+Remove substring "ab" and gain x points.
+For example, when removing "ab" from "cabxbae" it becomes "cxbae".
+Remove substring "ba" and gain y points.
+For example, when removing "ba" from "cabxbae" it becomes "cabxe".
+Return the maximum points you can gain after applying the above operations on s.
+
+ 
+
+Example 1:
+
+Input: s = "cdbcbbaaabab", x = 4, y = 5
+Output: 19
+Explanation:
+- Remove the "ba" underlined in "cdbcbbaaabab". Now, s = "cdbcbbaaab" and 5 points are added to the score.
+- Remove the "ab" underlined in "cdbcbbaaab". Now, s = "cdbcbbaa" and 4 points are added to the score.
+- Remove the "ba" underlined in "cdbcbbaa". Now, s = "cdbcba" and 5 points are added to the score.
+- Remove the "ba" underlined in "cdbcba". Now, s = "cdbc" and 5 points are added to the score.
+Total score = 5 + 4 + 5 + 5 = 19.
+Example 2:
+
+Input: s = "aabbaaxybbaabb", x = 5, y = 4
+Output: 20
+ 
+
+class Solution {
+public:
+    //with stack
+    string  removeSubString(string &s,string target,int point,int & cnt){
+        stack<char>st;
+        for (auto it : s){
+            if(it==target[1]){
+                if(!st.empty() && st.top()==target[0]){
+                    st.pop();
+                }else{
+                    st.push(it);
+                }
+            }else{
+                st.push(it);
+            }
+        }
+        int diff=s.size()-st.size();
+        cnt+=(diff/2)*point;
+        string temp;
+        while(!st.empty()){
+            auto ch=st.top();
+            st.pop();
+            temp.push_back(ch);
+        }
+        reverse(temp.begin(),temp.end());
+        return temp;
+
+
+    }
+
+    //second approach without using any stack O(1) space complexity
+    string removeSubString(string &s,string target,int point,int &cnt){
+        //read write method
+        //i will write whatever value j gives
+        int i=0,j=0;//i write pointer and j read pointer
+        while(j<s.size()){
+            s[i]=s[j];//write value of j first then check 
+            i++;j++;//and increment before checking
+            if(i>=2 && s[i-2]==target[0] && s[i-1]==target[1]){
+                i=i-2;
+            }
+        }
+        string temp=s.substr(0,i);
+        cout<<temp<<endl;
+        int diff=s.size()-temp.size();
+        cnt+=(diff/2)*point;
+
+        return s.substr(0,i);
+    
+    }
+    int maximumGain(string s, int x, int y) {
+        string fTarget="";string sTarget="";
+        int point1=0,point2=0;
+        if(x>y){
+            fTarget="ab";
+            sTarget="ba";
+            point1=x;point2=y;
+        }else{
+            fTarget="ba";
+            sTarget="ab";
+            point1=y;point2=x;
+        }
+        int cnt=0;
+        string remaining=removeSubString(s,fTarget,point1,cnt);
+        removeSubString(remaining,sTarget,point2,cnt);
+        return cnt;
+
+    }
+};
+
+Given two strings s and part, perform the following operation on s until all occurrences of the substring part are removed:
+
+Find the leftmost occurrence of the substring part and remove it from s.
+Return s after removing all occurrences of part.
+
+A substring is a contiguous sequence of characters in a string.
+
+ 
+
+Example 1:
+
+Input: s = "daabcbaabcbc", part = "abc"
+Output: "dab"
+Explanation: The following operations are done:
+- s = "daabcbaabcbc", remove "abc" starting at index 2, so s = "dabaabcbc".
+- s = "dabaabcbc", remove "abc" starting at index 4, so s = "dababc".
+- s = "dababc", remove "abc" starting at index 3, so s = "dab".
+Now s has no occurrences of "abc".
+Example 2:
+
+Input: s = "axxxxyyyyb", part = "xy"
+Output: "ab"
+Explanation: The following operations are done:
+- s = "axxxxyyyyb", remove "xy" starting at index 4 so s = "axxxyyyb".
+- s = "axxxyyyb", remove "xy" starting at index 3 so s = "axxyyb".
+- s = "axxyyb", remove "xy" starting at index 2 so s = "axyb".
+- s = "axyb", remove "xy" starting at index 1 so s = "ab".
+Now s has no occurrences of "xy".
+
+
+
+class Solution {
+public:
+    string removeOccurrences(string s, string part) {
+        stack<char> stk;
+        int strLength = s.length();
+        int partLength = part.length();
+
+        // Iterate through each character in the string
+        for (int index = 0; index < strLength; index++) {
+            // Push current character to stack
+            stk.push(s[index]);
+
+            // If stack size is greater than or equal to the part length, check
+            // for match
+            if (stk.size() >= partLength && checkMatch(stk, part, partLength)) {
+                // Pop the characters matching 'part' from the stack
+                for (int j = 0; j < partLength; j++) {
+                    stk.pop();
+                }
+            }
+        }
+
+        // Convert stack to string with correct order
+        string result = "";
+        while (!stk.empty()) {
+            result = stk.top() + result;
+            stk.pop();
+        }
+
+        return result;
+    }
+
+private:
+    // Helper function to check if the top of the stack matches the 'part'
+    bool checkMatch(stack<char>& stk, string& part, int partLength) {
+        stack<char> temp = stk;
+
+        // Iterate through part from right to left
+        for (int partIndex = partLength - 1; partIndex >= 0; partIndex--) {
+            // If current stack top doesn't match expected character
+            if (temp.top() != part[partIndex]) {
+                return false;
+            }
+            temp.pop();
+        }
+        return true;
+    }
+};
+
+//o(1) space solution
+class Solution {
+public:
+    string removeOccurrences(string s, string part) {
+        int i=0;int j=0;//i read pointer j write pointer
+        int k=part.size();
+        
+        while(j<s.size()){
+            s[i]=s[j];
+            i++;j++;
+            bool flag=true;
+            if(i-k<0)flag=false;
+            int idx=0;
+            for (int l=i-k;l<i && flag==true;l++){
+                if(s[l]!=part[idx])flag=false;
+                idx++;
+            }
+            if(flag){
+                i=i-k;
+            }
+        }
+        return s.substr(0,i);
+
+        
+    }
+};

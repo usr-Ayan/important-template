@@ -1249,6 +1249,589 @@ int dfs(int node,vector<vector<int>>&adj,vector<int>&visited){
 
 
 
+979. Distribute Coins in Binary Tree
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+You are given the root of a binary tree with n nodes where each node in the tree has node.val coins. There are n coins in total throughout the whole tree.
+
+In one move, we may choose two adjacent nodes and move one coin from one node to another. A move may be from parent to child, or from child to parent.
+
+Return the minimum number of moves required to make every node have exactly one coin.
+
+ 
+
+Example 1:
+
+
+Input: root = [3,0,0]
+Output: 2
+Explanation: From the root of the tree, we move one coin to its left child, and one coin to its right child.
+
+
+public:
+
+//ask every node how much candy is returned by left and right child total=left+right+root->val candies u have
+//keep 1 return other to daddy (+ or neg both should contribute to movement so add the absolute value)
+    int solve(TreeNode* root,int &move){
+        if(!root)return 0;
+        int lh=solve(root->left,move);
+        int rh=solve(root->right,move);
+        move+=abs(lh)+abs(rh);
+        return (lh+rh+root->val)-1;
+    }
+    int distributeCoins(TreeNode* root) {
+        int move=0;
+        solve(root,move);
+        return move;
+
+        
+    }
+};
+
+
+1457. Pseudo-Palindromic Paths in a Binary Tree
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given a binary tree where node values are digits from 1 to 9. A path in the binary tree is said to be pseudo-palindromic if at least one permutation of the node values in the path is a palindrome.
+
+Return the number of pseudo-palindromic paths going from the root node to leaf nodes.
+
+ 
+
+Example 1:
+
+
+
+Input: root = [2,3,1,3,1,null,1]
+Output: 2 
+Explanation: The figure above represents the given binary tree. There are three paths going from the root node to leaf nodes: the red path [2,3,3], the green path [2,1,1], and the path [2,3,1]. Among these paths only red path and green path are pseudo-palindromic paths since the red path [2,3,3] can be rearranged in [3,2,3] (palindrome) and the green path [2,1,1] can be rearranged in [1,2,1] (palindrome).
+Example 2:
+
+class Solution {
+
+public:
+    void solve(TreeNode* root,vector<int>&mp,int & cnt){
+        if(!root){
+            return;
+        }
+        
+        mp[root->val]++;
+        if(!root->right && !root->left){
+            int count=0;//counts number of element with odd frequency
+            for (int i=0;i<10;i++){
+                count+=(mp[i]%2);
+            }
+            if(count<=1){//if atmost one lement with odd frequency then path is valid
+                cnt++;
+
+            }
+
+        }
+        solve(root->left,mp,cnt);
+        solve(root->right,mp,cnt);
+        mp[root->val]--;
+        return;
+    }
+    int pseudoPalindromicPaths (TreeNode* root) {
+        vector<int>mp(10,0);
+        int cnt=0;
+        solve(root,mp,cnt);
+        return cnt;
+        
+    }
+};
+
+
+
+Count the nodes at distance K from leaf
+Difficulty: MediumAccuracy: 34.27%Submissions: 75K+Points: 4Average Time: 45m
+Given a binary tree with n nodes and a non-negative integer k, the task is to count the number of special nodes.
+A node is considered special if there exists at least one leaf in its subtree such that the distance between the node and leaf is exactly k.
+Note: Any such node should be counted only once. For example, if a node is at a distance k from 2 or more leaf nodes, then it would add only 1 to our count.
+
+Examples:
+
+Input:
+        1
+      /   \
+     2     3
+   /  \   /  \
+  4   5  6    7
+          \ 
+           8
+k = 2
+Output: 2
+Explanation: There are only two unique nodes that are at a distance of 2 units from the leaf node. (node 3 for leaf with value 8 and node 1 for leaves with values 4, 5 and 7) Note that node 2 isn't considered for leaf with value 8 because it isn't a direct ancestor of node 8.
+
+
+class Solution {
+  public:
+    // Function to return count of nodes at a given distance from leaf nodes.
+    void solve(Node* root,vector<Node*>&temp,unordered_set<Node*>&st,int k){
+        if(!root)return;
+        temp.push_back(root);
+        if(!root->left && !root->right){
+            if(k<temp.size()){
+                st.insert(temp[temp.size()-k-1]);
+            }
+        }
+        solve(root->left,temp,st,k);
+        solve(root->right,temp,st,k);
+        temp.pop_back();
+        return;
+        
+    }
+       
+    int printKDistantfromLeaf(Node* root, int k) {
+        vector<Node*>temp;
+        unordered_set<Node*>st;
+        solve(root,temp,st,k);
+        int n=st.size();
+        return n;
+    }
+};
+
+543. Diameter of Binary Tree
+Solved
+Easy
+Topics
+premium lock icon
+Companies
+Given the root of a binary tree, return the length of the diameter of the tree.
+
+The diameter of a binary tree is the length of the longest path between any two nodes in a tree. This path may or may not pass through the root.
+
+The length of a path between two nodes is represented by the number of edges between them.
+
+ 
+
+Example 1:
+
+
+Input: root = [1,2,3,4,5]
+Output: 3
+Explanation: 3 is the length of the path [4,2,1,3] or [5,2,1,3].
+
+
+class Solution {
+public:
+int solve(TreeNode* root,int &maxi){
+    if(!root)return 0;
+    int leftTree=solve(root->left,maxi);
+    int rightTree=solve(root->right,maxi);
+    maxi=max(maxi,leftTree+rightTree);//since the path should not necessarily to pass through rooot nade 
+    //so u can add left right and current node and make it a path
+
+    return 1+max(leftTree,rightTree);//but when u need to return u have to check one of left or right root and return it
+    //as u are hoping to make it a lerge path when it goes back
+}
+    int diameterOfBinaryTree(TreeNode* root) {
+        int maxi=0;
+        solve(root,maxi);
+        return maxi;
+        
+    }
+};
+
+
+513. Find Bottom Left Tree Value
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Given the root of a binary tree, return the leftmost value in the last row of the tree.
+
+ 
+
+Example 1:
+
+
+Input: root = [2,1,3]
+Output: 1
+Example 2:
+
+
+Input: root = [1,2,3,4,null,5,6,null,null,7]
+Output: 7
+ 
+
+Constraints:
+
+The number of nodes in the tree is in the range [1, 104].
+-231 <= Node.val <= 231 - 1
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void dfs(TreeNode* root,int level,unordered_map<int,int>&mp){
+        if(!root)return;
+        if(mp.find(level)==mp.end()){
+            mp[level]=root->val;
+        }
+        dfs(root->left,level+1,mp);
+        dfs(root->right,level+1,mp);
+        return;
+
+    }
+    int findBottomLeftValue(TreeNode* root) {
+
+        unordered_map<int,int>mp;
+        dfs(root,0,mp);
+        int level=-1;
+        int res=0;
+        for (auto &[x,y]:mp){
+            if(level<x){
+                level=x;
+                res=y;
+            }
+        }
+        return res;
+    }
+
+    //or
+       
+    int findBottomLeftValue(TreeNode* root) {
+
+         //in bfs we the queue holds nodes of a level at a time if and leftmost node of that level is the first node
+        //and right most node of that level is the last node since w push left first then right so if we change that
+        //order then that should also change  
+        queue<TreeNode*>q;
+        q.push(root);
+        TreeNode* node=NULL;
+        while(!q.empty()){
+            int n=q.size();
+            for (int i=0;i<n;i++){
+                node=q.front();
+                q.pop();
+                if(node->right){
+                    q.push(node->right);
+                }
+                if(node->left){
+                    q.push(node->left);
+                }
+            }
+        }
+        return node->val;
+        
+    }
+};
+
+1609. Even Odd Tree
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+A binary tree is named Even-Odd if it meets the following conditions:
+
+The root of the binary tree is at level index 0, its children are at level index 1, their children are at level index 2, etc.
+For every even-indexed level, all nodes at the level have odd integer values in strictly increasing order (from left to right).
+For every odd-indexed level, all nodes at the level have even integer values in strictly decreasing order (from left to right).
+Given the root of a binary tree, return true if the binary tree is Even-Odd, otherwise return false.
+Input: root = [1,10,4,3,null,7,9,12,8,6,null,null,2]
+Output: true
+
+Node: unordered_map + dfs and storing nodes levelwise works always
+
+class Solution {
+public:
+bool dfs(TreeNode* root,int level,unordered_map<int,int>&mp){
+    if(!root)return true;
+    if(mp.find(level)==mp.end()){
+        if(level%2==0){
+            if(root->val%2==0)return false;
+        }else{
+            if(root->val%2!=0)return false;
+        }
+        mp[level]=root->val;
+       
+
+    }
+    else{
+        if(level%2==0){
+            if(root->val%2==0 || root->val<=mp[level])return false;
+            mp[level]=root->val;
+
+        }else{
+            if(root->val%2!=0 || root->val>=mp[level])return false;
+            mp[level]=root->val;
+        }
+    }
+    return dfs(root->left,level+1,mp) && dfs(root->right,level+1,mp);
+
+
+
+}
+    bool isEvenOddTree(TreeNode* root) {
+        unordered_map<int,int>mp;
+        return dfs(root,0,mp);
+        
+    }
+};
+
+class Solution {
+public:
+
+    bool isEvenOddTree(TreeNode* root) {
+        queue<TreeNode*>q;
+        q.push(root);
+        int level=0;
+        while(!q.empty()){
+            int n=q.size();
+            int prev=(level%2==0)?-1:1e7;
+            for (int i=0;i<n;i++){
+                auto node=q.front();
+                if(level% 2==0){
+                    if(node->val%2==0 || node->val<=prev)return false;
+                    prev=node->val;
+                }
+                else{
+                    if(node->val%2!=0 || node->val>=prev)return false;
+                    prev=node->val;
+                }
+                q.pop();
+                if(node->left){
+                    q.push(node->left);
+
+                }
+                if(node->right){
+                    q.push(node->right);
+                }
+            }
+            level++;
+        }
+        return true;
+
+        
+    }
+};
+
+
+1325. Delete Leaves With a Given Value
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given a binary tree root and an integer target, delete all the leaf nodes with value target.
+
+Note that once you delete a leaf node with value target, if its parent node becomes a leaf node and has the value target, it should also be deleted (you need to continue doing that until you cannot).
+
+ 
+
+Example 1:
+
+
+
+Input: root = [1,2,3,2,null,2,4], target = 2
+Output: [1,null,3,null,4]
+Explanation: Leaf nodes in green with value (target = 2) are removed (Picture in left). 
+After removing, new nodes become leaf nodes with value (target = 2) (Picture in center).
+
+
+
+class Solution {
+public:
+    TreeNode* solve(TreeNode* root,int &target){
+        if(!root)return NULL;
+        root->left=solve(root->left,target);
+        root->right=solve(root->right,target);
+        if(!root->left && !root->right){
+            if(root->val==target){
+                return NULL;
+            }else{
+                return root;
+            }
+        }else{
+            return root;
+        }
+    }
+    TreeNode* removeLeafNodes(TreeNode* root, int target) {
+        //since if we delete while we are going top to down then we will be breaking the connection
+        //so go to the leaf while backtracking check if it's meeting the cond then delete and return NULL otherwise return
+        //node
+        return solve(root,target);
+
+        
+    }
+};
+
+
+very good question
+
+2196. Create Binary Tree From Descriptions
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a 2D integer array descriptions where descriptions[i] = [parenti, childi, isLefti] indicates that parenti is the parent of childi in a binary tree of unique values. Furthermore,
+
+If isLefti == 1, then childi is the left child of parenti.
+If isLefti == 0, then childi is the right child of parenti.
+Construct the binary tree described by descriptions and return its root.
+
+The test cases will be generated such that the binary tree is valid.
+
+ 
+
+Example 1:
+
+
+Input: descriptions = [[20,15,1],[20,17,0],[50,20,1],[50,80,0],[80,19,1]]
+Output: [50,20,80,15,17,19]
+Explanation: The root node is the node with value 50 since it has no parent.
+The resulting binary tree is shown in the diagram.
+
+
+class Solution {
+public:
+    TreeNode* createBinaryTree(vector<vector<int>>& descriptions) {
+        unordered_map<int,int>mp;//childto parent map;
+        for (auto &it :descriptions){
+            int parent=it[0];
+            int child=it[1];
+            mp[child]=parent;
+        }
+        
+        int root=0;
+        unordered_map<int,TreeNode*>mp2;
+        //building the tree
+        for (auto it : descriptions){
+            int parent=it[0];
+            int child=it[1];
+            if(mp.find(parent)==mp.end())root=parent;//the guyalways appered as parent and but never in parentToChildMap(mp)
+            //bcz he never had a parent so he is the root
+            bool isLeft=it[2];
+            TreeNode* parentNode=NULL,*childNode=NULL;//Iget know for the first time we can declare this way
+            if(mp2.find(parent)==mp2.end()){
+                parentNode=new TreeNode(parent);
+                mp2[parent]=parentNode;
+                
+
+            }else{
+                parentNode=mp2[parent];
+            }
+            if(mp2.find(child)==mp2.end()){
+                childNode=new TreeNode(child);
+                mp2[child]=childNode;
+            }
+            else{
+                childNode=mp2[child];
+            }
+            if(isLeft){
+                parentNode->left=childNode;
+            }else{
+                parentNode->right=childNode;
+            }
+
+        }
+        cout<<root;
+        for (auto it :mp2){
+            if(it.first==root)return mp2[root];
+        }
+        return NULL;
+
+
+        
+    }
+};
+
+
+2096. Step-By-Step Directions From a Binary Tree Node to Another
+Attempted
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given the root of a binary tree with n nodes. Each node is uniquely assigned a value from 1 to n. You are also given an integer startValue representing the value of the start node s, and a different integer destValue representing the value of the destination node t.
+
+Find the shortest path starting from node s and ending at node t. Generate step-by-step directions of such path as a string consisting of only the uppercase letters 'L', 'R', and 'U'. Each letter indicates a specific direction:
+
+'L' means to go from a node to its left child node.
+'R' means to go from a node to its right child node.
+'U' means to go from a node to its parent node.
+Return the step-by-step directions of the shortest path from node s to node t.
+
+ 
+
+Example 1:
+
+
+Input: root = [5,1,2,3,null,6,4], startValue = 3, destValue = 6
+Output: "UURL"
+Explanation: The shortest path is: 3 → 1 → 5 → 2 → 6.
+'MLE
+class Solution {
+public:
+    void makeGraph(TreeNode* root,unordered_map<int,vector<pair<int,string>>>&adj){
+        if(root->left){
+            adj[root->val].push_back({root->left->val,"L"});
+            adj[root->left->val].push_back({root->val,"U"});
+
+            makeGraph(root->left,adj);
+        }
+        if(root->right){
+            adj[root->val].push_back({root->right->val,"R"});
+            adj[root->right->val].push_back({root->val,"U"});
+            makeGraph(root->right,adj);
+        }
+    }
+    string getDirections(TreeNode* root, int start, int dest) {
+        unordered_map<int,vector<pair<int,string>>>adj;
+        makeGraph(root,adj);
+        queue<pair<int,string>>q;
+        unordered_map<int,int>visited;
+        q.push({start,""});
+        visited[start]=1;
+        while(!q.empty()){
+            auto node=q.front().first;
+            string s=q.front().second;
+            q.pop();
+            if(node==dest){
+                return s;
+            }
+            for (auto it : adj[node]){
+                if(!visited[it.first]){
+                    visited[it.first]=1;
+                    q.push({it.first,s+it.second});
+                }
+            }
+            
+        }
+        return "";
+
+
+        
+    }
+};
+OPTIMISED
+
+
+
 366. Find Leaves of Binary Tree
 Leetcode Link
 Given the root of a binary tree, collect a tree's nodes as if you were doing this:

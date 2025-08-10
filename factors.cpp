@@ -85,7 +85,7 @@ int main() {
 
 #include<bits/stdc++.h>
 using namespace std;
-vectoraa<int>&temp;
+vector<int>&temp;
 
 void printAllFactors(int n){
 
