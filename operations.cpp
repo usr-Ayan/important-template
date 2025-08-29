@@ -12,7 +12,55 @@ Return the minimum number of k-bit flips required so that there is no 0 in the a
 
 A subarray is a contiguous part of an array.
 
+brute
+class Solution {
+public:
+    int minKBitFlips(vector<int>& nums, int k) {
+        int n=nums.size();
+        int flip=0;
+        for (int i=0;i<n;i++){
+            if(nums[i]==0){
+                cout<<i<<endl;
+                if(i+k>n)return -1;
+                for (int j=i;j<=i+k-1;j++){
+                    nums[j]=!nums[j];
+                }
+                flip++;
+            }
+        }
+        return flip;
+        
+    }
+};
+or
 
+class Solution {
+public:
+    int minKBitFlips(vector<int>& nums, int k) {
+        int n=nums.size();
+        int flip=0;
+        int res=0;
+        vector<int>isFlipped(n,0);
+        for (int i=0;i<n;i++){//if i make a flip its effect will last from i to i+k-1 position both inclusive
+            //first check if current index is in the flips range if yes then it will have its effect
+            if(i-k>=0 && isFlipped[i-k]){
+                flip--;//if I made a flip k away from me then that should not affect me so rmove that effect from flip
+               
+            }
+            if((flip+nums[i])%2==0){
+                isFlipped[i]=1;
+                if(i+k>n)return -1;//if I make a flip that should last upto i+k =>but if that is not present then can't flip
+                flip++;//if the effect of flip plus current number i.e=effective current number is zero then do a flip
+                res++;
+            }
+           
+        }
+        return res;
+        
+    }
+};
+
+or
 
 class Solution {
 public:
@@ -39,6 +87,100 @@ public:
         return flip;
 
         
+    }
+};
+
+
+319. Bulb Switcher
+Attempted
+Medium
+Topics
+premium lock icon
+Companies
+There are n bulbs that are initially off. You first turn on all the bulbs, then you turn off every second bulb.
+
+On the third round, you toggle every third bulb (turning on if it's off or turning off if it's on). For the ith round, you toggle every i bulb. For the nth round, you only toggle the last bulb.
+
+Return the number of bulbs that are on after n rounds.
+
+ 
+
+Example 1:
+
+
+Input: n = 3
+Output: 1
+Explanation: At first, the three bulbs are [off, off, off].
+After the first round, the three bulbs are [on, on, on].
+After the second round, the three bulbs are [on, off, on].
+After the third round, the three bulbs are [on, off, off]. 
+So you should return 1 because there is only one bulb is on.
+Example 2:
+
+Input: n = 0
+Output: 0
+Example 3:
+
+Input: n = 1
+Output: 1
+
+brute
+
+class Solution {
+public:
+    int bulbSwitch(int n) {
+        vector<int>bulbs(n,1);
+        int cnt=0;
+        for (int round=2;round<=n;round++){
+            int i=-1;
+            while(i+round<n){
+                i=i+round;
+                bulbs[i]=!bulbs[i];
+
+            }
+
+        }
+        for (int i=0;i<n;i++){
+            cnt+=bulbs[i];
+        }
+        return cnt;
+        
+    }
+};
+
+or
+
+class Solution {
+public:
+    int bulbSwitch(int n) {
+       //since initially bulbs are all off initially 
+       //so if they are toggled even number of times then they would be off
+       //if they are toggled odd number of times then they would be on
+
+       //now any bulb will be toggled how many times depends on its factors=>even number of factors=>even no of times
+       //=>odd number of factors=>then odd number of times=>only perfect numbers have odd factors=>so they will be on 
+        int cnt=0;
+        for (int i=1;i<=n;i++){
+            int root=sqrt(i);
+            int original=root*root;
+            if(original==i)cnt++;
+
+        }
+        return cnt;
+        
+    }
+};
+or
+class Solution {
+public:
+    int bulbSwitch(int n) {
+       //since initially bulbs are all off initially 
+       //so if they are toggled even number of times then they would be off
+       //if they are toggled odd number of times then they would be on
+
+       //now any bulb will be toggled how many times depends on its factors=>even number of factors=>even no of times
+       //=>odd number of factors=>then odd number of times=>only perfect numbers have odd factors=>so they will be on 
+        return sqrt(n);
     }
 };
 
@@ -438,6 +580,7 @@ public:
         for (auto it :s){
             if(it=='['){
                 st.push('[');
+
             }
             else{
                 if(!st.empty())st.pop();
@@ -475,7 +618,7 @@ public:
     }
 };
 
-249. Minimum Remove to Make Valid Parentheses
+1249. Minimum Remove to Make Valid Parentheses
 Solved
 Medium
 Topics
@@ -540,8 +683,63 @@ public:
         
     }
 };
+or
 
-2171. Removing Minimum Number of Magic Beans
+class Solution {
+public:
+    string minRemoveToMakeValid(string s) {
+        stack<char>st;
+        int open=0,close=0;
+        //first pass from left to right removes all the unnecessary closed brackets
+        for (int i=0;i<s.size();i++){
+            if(s[i]!=')' && s[i]!='('){
+                st.push(s[i]);
+            }
+            else if(s[i]=='('){
+                open++;
+                st.push(s[i]);
+            }
+            else if (s[i]==')'){
+                if(open){
+                    open--;
+                    st.push(s[i]);
+                }
+            }
+        }
+        string temp="";
+        while(!st.empty()){
+            temp.push_back(st.top());
+            st.pop();
+        }
+        reverse(temp.begin(),temp.end());
+        //second pass from right to left to remove unnecessary open brces
+        for (int i=temp.size()-1;i>=0;i--){
+            if(temp[i]!=')' && temp[i]!='('){
+                st.push(temp[i]);
+            }
+            else if (temp[i]==')'){
+                close++;
+                st.push(temp[i]);
+            }
+            else if(temp[i]=='('){
+                if(close){
+                    close--;
+                    st.push(temp[i]);
+                }
+            }
+        }
+        string ans="";
+        while(!st.empty()){
+            ans.push_back(st.top());
+            st.pop();
+        }
+        return ans;
+
+        
+    }
+};
+
+bb.2171. Removing Minimum Number of Magic Beans
 Solved
 Medium
 Topics
@@ -587,19 +785,18 @@ There are no other solutions that removes 7 beans or fewer.
 class Solution {
 public:
     long long minimumRemoval(vector<int>& beans) {
-        int n=beans.size();
-        sort(beans.begin(),beans.end());
+        //here the questions trick is how many of them you decide to make 0 and how
+        //many of them you decide to make of same value
+        long long n=beans.size();
         long long mini=LLONG_MAX;
-        long long total=accumulate(beans.begin(),beans.end(),0LL);
-        for (int i=0;i<n;i++){
-            mini=min(mini,total-(1LL*(n-i)*beans[i]));
+        sort(beans.begin(),beans.end());
+        long long total=accumulate(beans.begin(),beans.end(),0ll);
+        for (int i=0;i<beans.size();i++){
+            mini=min(mini,total-(1LL*beans[i]*(n-i)));
         }
         return mini;
-
-        
     }
 };
-
 
 2391. Minimum Amount of Time to Collect Garbage
 Solved
@@ -897,7 +1094,8 @@ Solved
 Medium
 Topics
 premium lock icon
-Companies
+Companies cnt=0;
+        for (int
 Hint
 Given an integer array of size n, find all elements that appear more than ⌊ n/3 ⌋ times.
 
@@ -979,7 +1177,7 @@ public:
 };
 
 
-1497. Check If Array Pairs Are Divisible by k
+bb.1497. Check If Array Pairs Are Divisible by k
 Solved
 Medium
 Topics
@@ -2144,5 +2342,480 @@ public:
         return s.substr(0,i);
 
         
+    }
+};
+
+
+3138. Minimum Length of Anagram Concatenation
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a string s, which is known to be a concatenation of anagrams of some string t.
+
+Return the minimum possible length of the string t.
+
+An anagram is formed by rearranging the letters of a string. For example, "aab", "aba", and, "baa" are anagrams of "aab".
+
+ 
+
+Example 1:
+
+Input: s = "abba"
+
+Output: 2
+
+Explanation:
+
+One possible string t could be "ba".
+
+Example 2:
+
+Input: s = "cdef"
+
+Output: 4
+
+Explanation:
+
+One possible string t could be "cdef", notice that t can be equal to s.
+
+Example 2:
+
+Input: s = "abcbcacabbaccba"
+
+Output: 3
+
+ 
+
+Constraints:
+
+1 <= s.length <= 105
+s consist only of lowercase English letters.
+
+
+//this would give mle but this is intution
+
+class Solution {
+public:
+    int minAnagramLength(string s) {
+        int n=s.size();
+        for (int i=0;i<n;i++){
+            //assume any string from the beginning as to be your answer
+            //so if it is your answer try to concatinate to make the whole string
+            string temp=s.substr(0,i+1);
+            if(s.size()%temp.size()==0){
+                sort(temp.begin(),temp.end());
+                bool flag=true;
+                for (int j=i+1;j<n;j+=temp.size()){
+                    string cur=s.substr(j,temp.size());
+                    sort(cur.begin(),cur.end());
+                    if(temp!=cur){
+                        flag=false;
+                        break;
+                    }
+                }
+                if(flag)return temp.size();
+            }
+        }
+        return n;
+        
+    }
+};
+
+
+//a minor change and good to go
+
+class Solution {
+public:
+    int minAnagramLength(string s) {
+        int n=s.size();
+        for (int i=0;i<n;i++){
+            //assume any string from the beginning as to be your answer
+            //so if it is your answer try to concatinate to make the whole string
+            
+            if(n%(i+1)==0){
+                string temp=s.substr(0,i+1);
+                sort(temp.begin(),temp.end());
+                bool flag=true;
+                for (int j=i+1;j<n;j+=temp.size()){
+                    string cur=s.substr(j,temp.size());
+                    sort(cur.begin(),cur.end());
+                    if(temp!=cur){
+                        flag=false;
+                        break;
+                    }
+                }
+                if(flag)return temp.size();
+            }
+        }
+        return n;
+        
+    }
+};
+
+
+
+
+1353. Maximum Number of Events That Can Be Attended
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given an array of events where events[i] = [startDayi, endDayi]. Every event i starts at startDayi and ends at endDayi.
+
+You can attend an event i at any day d where startDayi <= d <= endDayi. You can only attend one event at any time d.
+
+Return the maximum number of events you can attend.
+
+ 
+
+Example 1:
+
+
+Input: events = [[1,2],[2,3],[3,4]]
+Output: 3
+Explanation: You can attend all the three events.
+One way to attend them all is as shown.
+Attend the first event on day 1.
+Attend the second event on day 2.
+Attend the third event on day 3.
+Example 2:
+
+Input: events= [[1,2],[2,3],[3,4],[1,2]]
+Output: 4
+ 
+
+ class Solution {
+public:
+    int maxEvents(vector<vector<int>>& events) {
+        int n=events.size();
+        sort(events.begin(),events.end());
+        int day=events[0][0];
+        priority_queue<int,vector<int>,greater<int>>pq;
+        int i=0;
+        int cnt=0;
+        while(i<n || !pq.empty()){//1,2  1,3 , 1,4  I have to enetr the loop again to process other 2 nodes as 
+        //I am just processing one at a time
+            while(i<n && events[i][0]==day){
+                pq.push(events[i][1]);
+                i++;
+            }
+            //cleanup  // 1,1  1,2  1,2 1,3 I cannot attend the second 1,2 
+            while(!pq.empty() && pq.top()<day){
+                // 1,1  1,2  1,2 1,3
+                pq.pop();
+
+            }
+            if(!pq.empty()){//means there are on going events 
+                pq.pop();
+                cnt++;
+
+            }
+            day++;
+        }
+        return cnt;
+    }
+};
+
+
+
+
+1209. Remove All Adjacent Duplicates in String II
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+You are given a string s and an integer k, a k duplicate removal consists of choosing k adjacent and equal letters from s and removing them, causing the left and the right side of the deleted substring to concatenate together.
+
+We repeatedly make k duplicate removals on s until we no longer can.
+
+Return the final string after all such duplicate removals have been made. It is guaranteed that the answer is unique.
+
+ 
+
+Example 1:
+
+Input: s = "abcd", k = 2
+Output: "abcd"
+Explanation: There's nothing to delete.
+Example 2:
+
+Input: s = "deeedbbcccbdaa", k = 3
+Output: "aa"
+Explanation: 
+First delete "eee" and "ccc", get "ddbbbdaa"
+Then delete "bbb", get "dddaa"
+Finally delete "ddd", get "aa"
+'
+
+class Solution {
+public:
+    string removeDuplicates(string s, int k) {
+        stack<pair<char,int>>st;
+        for (int i=0;i<s.size();i++){
+            if(st.empty() ||st.top().first!=s[i]){
+                st.push({s[i],1});
+            }else{
+                auto temp=st.top();
+                st.pop();
+                st.push({s[i],temp.second+1});
+            }
+            if(!st.empty() && st.top().second==k){
+                st.pop();
+
+            }
+
+        }
+        string res;
+        while(!st.empty()){
+            auto temp=st.top();
+            st.pop();
+            while(temp.second--){
+                res.push_back(temp.first);
+            }
+        }
+        reverse(res.begin(),res.end());
+        return res;
+        
+    }
+};
+
+
+
+1328. Break a Palindrome
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Hint
+Given a palindromic string of lowercase English letters palindrome, replace exactly one character with any lowercase English letter so that the resulting string is not a palindrome and that it is the lexicographically smallest one possible.
+
+Return the resulting string. If there is no way to replace a character to make it not a palindrome, return an empty string.
+
+A string a is lexicographically smaller than a string b (of the same length) if in the first position where a and b differ, a has a character strictly smaller than the corresponding character in b. For example, "abcc" is lexicographically smaller than "abcd" because the first position they differ is at the fourth character, and 'c' is smaller than 'd'.
+
+ 
+
+Example 1:
+
+Input: palindrome = "abccba"
+Output: "aaccba"
+Explanation: There are many ways to make "abccba" not a palindrome, such as "zbccba", "aaccba", and "abacba".
+Of all the ways, "aaccba" is the lexicographically smallest.
+Example 2:
+
+Input: palindrome = "a"
+Output: ""
+Explanation: There is no way to replace a single character to make "a" not a palindrome, so return an empty string.
+//brute force on the values since values are limited
+
+class Solution {
+public:
+    string breakPalindrome(string palindrome) {
+        int n=palindrome.size();
+        if(n==1)return"";
+       
+        for (int k=0;k<26;k++){
+            int i=0;int j=n-1;
+            while(i<j){
+                if(palindrome[i]!=(k+'a')){
+                    string temp1=palindrome;
+                    string temp2=palindrome;
+                    temp1[i]=(k+'a');
+                    temp2[j]=(k+'a');
+                    return min(temp1,temp2);
+                }
+                i++;j--;
+            }
+        }
+        return "";
+        
+    }
+};
+
+
+992. Subarrays with K Different Integers
+Solved
+Hard
+Topics
+premium lock icon
+Companies
+Hint
+Given an integer array nums and an integer k, return the number of good subarrays of nums.
+
+A good array is an array where the number of different integers in that array is exactly k.
+
+For example, [1,2,3,1,2] has 3 different integers: 1, 2, and 3.
+A subarray is a contiguous part of an array.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,1,2,3], k = 2
+Output: 7
+Explanation: Subarrays formed with exactly 2 different integers: [1,2], [2,1], [1,2], [2,3], [1,2,1], [2,1,2], [1,2,1,2]
+Example 2:
+
+Input: nums = [1,2,1,3,4], k = 3
+Output: 3
+Explanation: Subarrays formed with exactly 3 different integers: [1,2,1,3], [2,1,3], [1,3,4].
+
+
+class Solution {
+public:
+    int solve(vector<int>nums,int k){
+        int i=0;
+        int j=0;
+        int n=nums.size();
+        unordered_map<int,int>mp;
+        int cnt=0;
+        while(j<n){
+            mp[nums[j]]++;
+            while(mp.size()>k){
+                cnt+=(n-j);
+                mp[nums[i]]--;
+                if(mp[nums[i]]==0)mp.erase(nums[i]);
+                i++;
+            }
+            j++;
+
+        }
+        return cnt;
+    }
+    int subarraysWithKDistinct(vector<int>& nums, int k) {
+        return solve(nums,k-1)-solve(nums,k);
+        
+    }
+};
+
+
+468. Validate IP Address
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Given a string queryIP, return "IPv4" if IP is a valid IPv4 address, "IPv6" if IP is a valid IPv6 address or "Neither" if IP is not a correct IP of any type.
+
+A valid IPv4 address is an IP in the form "x1.x2.x3.x4" where 0 <= xi <= 255 and xi cannot contain leading zeros. For example, "192.168.1.1" and "192.168.1.0" are valid IPv4 addresses while "192.168.01.1", "192.168.1.00", and "192.168@1.1" are invalid IPv4 addresses.
+
+A valid IPv6 address is an IP in the form "x1:x2:x3:x4:x5:x6:x7:x8" where:
+
+1 <= xi.length <= 4
+xi is a hexadecimal string which may contain digits, lowercase English letter ('a' to 'f') and upper-case English letters ('A' to 'F').
+Leading zeros are allowed in xi.
+For example, "2001:0db8:85a3:0000:0000:8a2e:0370:7334" and "2001:db8:85a3:0:0:8A2E:0370:7334" are valid IPv6 addresses, while "2001:0db8:85a3::8A2E:037j:7334" and "02001:0db8:85a3:0000:0000:8a2e:0370:7334" are invalid IPv6 addresses.
+
+ 
+
+Example 1:
+
+Input: queryIP = "172.16.254.1"
+Output: "IPv4"
+Explanation: This is a valid IPv4 address, return "IPv4".
+
+class Solution {
+public:
+    string validIPAddress(string queryIP) {
+        string temp="0123456789abcdefABCDEF";
+
+        unordered_set<int>st(temp.begin(),temp.end());
+        int cnt1=0,cnt2=0;
+        for (auto it :queryIP){
+            if(it=='.'){
+                cnt1++;
+            }
+            if(it==':'){
+                cnt2++;
+            }
+        }
+        if(cnt1==3 && cnt2==0){
+            if(queryIP[queryIP.size()-1]=='.')return "Neither";
+            stringstream ss(queryIP);
+            string token;
+            while(getline(ss,token,'.')){
+                if(token[0]=='0' && token.size()!=1)return "Neither";
+                if(token.size()==0 || token.size()>3)return "Neither";
+                for (auto it : token){
+                    if(!isdigit(it))return "Neither";
+                }
+                if(stoi(token)>=256)return "Neither";
+            }
+            return "IPv4";
+        }
+        else if (cnt1==0 && cnt2==7){
+            if(queryIP[queryIP.size()-1]==':')return "Neither";
+            stringstream ss(queryIP);
+            string token;
+            while(getline(ss,token,':')){
+                if(token.size()>4 || token.size()==0)return "Neither";
+                for (auto it : token){
+                    if(!st.contains(it))return "Neither";
+                }
+            }
+            return "IPv6";
+
+        }
+        else{
+            return "Neither";
+        }
+        
+    }
+};
+
+
+
+453. Minimum Moves to Equal Array Elements
+Solved
+Medium
+Topics
+premium lock icon
+Companies
+Given an integer array nums of size n, return the minimum number of moves required to make all array elements equal.
+
+In one move, you can increment n - 1 elements of the array by 1.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,3]
+Output: 3
+Explanation: Only three moves are needed (remember each move increments two elements):
+[1,2,3]  =>  [2,3,3]  =>  [3,4,3]  =>  [4,4,4]
+Example 2:
+
+Input: nums = [1,1,1]
+Output: 0
+ 
+
+ class Solution {
+public:
+    int minMoves(vector<int>& nums) {
+        //now on every move u are allowed to increment n-1 elements and you proceed upto the time when
+        //all them become equal=>so that means u want to make their relative differnce 0
+        
+        //so now instead incrementing n-1 elements by 1 out of n guys it is equivalent to decrement
+        //one guy leaving others same since we are just concerned about their relative value
+        //so our problem becomes on every move u are allowed to decrement one guy by 1 and u do 
+        //until all of them becomes equal =>then how many moves do we need
+        int mini=1e9;
+        for (auto it : nums){
+            mini=min(mini,it);
+        }
+        int total=0;
+        for (int i=0;i<nums.size();i++){
+            total+=nums[i]-mini;
+        }
+        return total;
+
     }
 };
